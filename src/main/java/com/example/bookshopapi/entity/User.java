@@ -48,7 +48,7 @@ public class User {
     private String avatar;
 
     @Column(name = "status")
-    private String status;
+    private int status = 1;
 
     @ManyToOne
     @JoinColumn(name = "role_id")
@@ -65,4 +65,5 @@ public class User {
 //    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
 //    @JsonIgnore
 //    private List<Rating> ratings;
+
 }

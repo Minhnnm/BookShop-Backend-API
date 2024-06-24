@@ -19,5 +19,5 @@ public class UserDto {
     private String gender;
     private String avatar;
     private String status;
-    private String role;
+    private String roleUser;
 }

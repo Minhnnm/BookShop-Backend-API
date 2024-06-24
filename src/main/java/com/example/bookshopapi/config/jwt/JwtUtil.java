@@ -63,8 +63,7 @@ public class JwtUtil {
             // Nếu thời gian hết hạn lớn hơn thời gian hiện tại, token còn hiệu lực
             return true;
         } catch (Exception e) {
-            // Xử lý lỗi khi kiểm tra tính hợp lệ của access token
-            return false; // Token không hợp lệ
+            return false;
         }
     }
 

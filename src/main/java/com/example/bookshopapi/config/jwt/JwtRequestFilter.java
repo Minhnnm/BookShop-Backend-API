@@ -1,5 +1,7 @@
 package com.example.bookshopapi.config.jwt;
 
+import com.example.bookshopapi.exception.UnAuthorizedException;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,8 +31,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String token = null;
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
-            token = authorizationHeader;
-            username = jwtUtil.extractId(token);
+            token = authorizationHeader.substring(7);
+            try {
+                username = jwtUtil.extractId(token);
+            } catch (IllegalArgumentException e) {
+                throw new UnAuthorizedException("Unable to get JWT Token");
+            } catch (ExpiredJwtException e) {
+                throw new UnAuthorizedException("JWT Token has expired");
+            }
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = jwtUtil.extractUserDetails(token);

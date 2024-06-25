@@ -5,13 +5,14 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 
 @Component
 public class JwtUtil {
@@ -22,7 +23,8 @@ public class JwtUtil {
         // Tạo JWT từ thông tin người dùng
         // Sử dụng thư viện JWT để tạo mã JWT và thêm thông tin người dùng
         return Jwts.builder()
-                .setSubject(user.getId() + "")
+//                .setClaims(claims)
+                .setSubject(user.getEmail())
                 .setIssuedAt(new Date())
 //                .setExpiration(new Date(System.currentTimeMillis() + 10 * 60 * 60 * 1000)) // 10 giờ
                 .setExpiration(new Date(System.currentTimeMillis() + 3 * 60 * 60 * 1000))
@@ -56,12 +58,7 @@ public class JwtUtil {
 
             Date expirationDate = claims.getExpiration();
             Date currentDate = new Date();
-            // Kiểm tra nếu thời gian hết hạn nhỏ hơn thời gian hiện tại
-            if (expirationDate.before(currentDate)) {
-                return false; // Token đã hết hạn
-            }
-            // Nếu thời gian hết hạn lớn hơn thời gian hiện tại, token còn hiệu lực
-            return true;
+            return expirationDate.before(currentDate); //true đã hết hạn or false còn hiệu lực
         } catch (Exception e) {
             return false;
         }

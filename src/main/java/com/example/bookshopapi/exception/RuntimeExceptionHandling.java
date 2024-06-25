@@ -17,8 +17,8 @@ public class RuntimeExceptionHandling extends RuntimeException {
     }
 
     public RuntimeExceptionHandling(String errorCode,
-                                    String field,
-                                    String message) {
+                                    String message,
+                                    String field) {
         super(message);
         this.errorCode = errorCode;
         this.field = field;

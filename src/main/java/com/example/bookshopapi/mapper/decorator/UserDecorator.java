@@ -16,8 +16,8 @@ public abstract class UserDecorator implements UserMapper {
 
     @Override
     public UserDto toDto(User entity) {
-        UserDto userDto=delegate.toDto(entity);
-        if(entity.getRole()!=null){
+        UserDto userDto = delegate.toDto(entity);
+        if (entity.getRole() != null) {
             userDto.setRoleUser(entity.getRole().getName());
         }
         return userDto;
@@ -25,12 +25,12 @@ public abstract class UserDecorator implements UserMapper {
 
     @Override
     public List<UserDto> toDtos(List<User> entities) {
-        if(entities==null)
+        if (entities == null)
             return null;
-        List<UserDto> dtos = new ArrayList<>();
-        for (User entity : entities) {
-            dtos.add(toDto(entity));
+        List<UserDto> userDtos = new ArrayList<>();
+        for (User user : entities) {
+            userDtos.add(toDto(user));
         }
-        return dtos;
+        return userDtos;
     }
 }

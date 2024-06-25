@@ -37,16 +37,15 @@ public class UserController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
-
-    @GetMapping("/all")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/test")
     public ResponseEntity<?> getUserNumber() {
         return ResponseEntity.ok(userService.getAll());
 //        return ResponseEntity.ok(new Message("Số lượng khách hàng sử dụng dịch vụ: " + customerService.getAll().size()));
     }
-    @PostMapping("")
+    @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserRequestDto userRequestDto) {
-        return ResponseEntity.ok(userService.save(userRequestDto));
+        return ResponseEntity.ok(userService.register(userRequestDto));
     }
 
     @PostMapping("/login")

@@ -5,8 +5,6 @@ import com.example.bookshopapi.entity.User;
 import com.example.bookshopapi.mapper.decorator.UserDecorator;
 import org.mapstruct.DecoratedWith;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
 
 @Mapper(componentModel = "spring")
 @DecoratedWith(UserDecorator.class)

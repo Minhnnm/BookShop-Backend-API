@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface UserService {
     List<User> getAll();
-    UserDto save(UserRequestDto userDto);
+    UserDto register(UserRequestDto userDto);
     LoginResponse login(UserRequestDto userDto);
 }

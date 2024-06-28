@@ -37,12 +37,10 @@ public abstract class ProductDecorator implements ProductMapper {
         if (entities == null) {
             return null;
         }
-
         List<ProductDto> dtos = new ArrayList<>();
         for (Product entity : entities) {
             dtos.add(toDto(entity));
         }
-
         return dtos;
     }
 }

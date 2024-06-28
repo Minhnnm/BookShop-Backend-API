@@ -32,5 +32,4 @@ public class GlobalExceptionError {
         this.errorCode = errorCode;
         this.field = field;
     }
-    //
 }

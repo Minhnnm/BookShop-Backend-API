@@ -3,6 +3,7 @@ package com.example.bookshopapi.exception.handler;
 import com.example.bookshopapi.exception.BadRequestException;
 import com.example.bookshopapi.exception.ExistedException;
 import com.example.bookshopapi.exception.UnAuthorizedException;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

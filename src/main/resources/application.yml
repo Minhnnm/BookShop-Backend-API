@@ -10,8 +10,25 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-
-
+  #config mail
+  mail:
+    protocol: smtp
+    host: smtp.gmail.com
+    port: 587
+    username: bookshops.app@gmail.com
+    password: yhzh wuhn xxlh lmhe
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
+  #set-max-file-size
+  servlet:
+    multipart:
+      max-request: 6MB
+      max-file-size: 3MB
 
 jwt:
   secret: minhnn_jwt

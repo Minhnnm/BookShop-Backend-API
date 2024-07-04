@@ -47,12 +47,19 @@ public class User {
     @Column(name = "avatar")
     private String avatar;
 
-    @Column(name = "status")
-    private int status = 1;
+    @Column(name = "created_date")
+    private LocalDate createdDate;
+
+    @Column(name = "updated_date")
+    private LocalDate updatedDate;
 
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+
+    @Column(name = "status")
+    private int status = 1;
+
 //    @OneToMany(mappedBy = "customer")
 //    @JsonIgnore
 //    private List<Order> orders;

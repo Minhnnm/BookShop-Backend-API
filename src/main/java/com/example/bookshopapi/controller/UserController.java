@@ -1,10 +1,8 @@
 package com.example.bookshopapi.controller;
 
 import com.example.bookshopapi.config.jwt.JwtUtil;
+import com.example.bookshopapi.dto.user.UserDto;
 import com.example.bookshopapi.dto.user.UserRequestDto;
-import com.example.bookshopapi.entity.Cart;
-import com.example.bookshopapi.entity.User;
-import com.example.bookshopapi.entity.WishList;
 import com.example.bookshopapi.service.CartService;
 import com.example.bookshopapi.service.EmailService;
 import com.example.bookshopapi.service.UserService;
@@ -16,9 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/users")
@@ -26,30 +22,76 @@ public class UserController {
     @Autowired
     private UserService userService;
     @Autowired
-    private WishListService wishListService;
-    @Autowired
-    private CartService cartService;
-    @Autowired
     private EmailService emailService;
-    @Autowired
-    private JwtUtil jwtUtil;
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private PasswordEncoder bCryptPasswordEncoder;
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/test")
     public ResponseEntity<?> getUserNumber() {
         return ResponseEntity.ok(userService.getAll());
-//        return ResponseEntity.ok(new Message("Số lượng khách hàng sử dụng dịch vụ: " + customerService.getAll().size()));
     }
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserRequestDto userRequestDto) {
         return ResponseEntity.ok(userService.register(userRequestDto));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserRequestDto userRequestDto){
+    public ResponseEntity<?> login(@RequestBody UserRequestDto userRequestDto) {
         return ResponseEntity.ok(userService.login(userRequestDto));
+    }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PostMapping("forgot-password")
+    public ResponseEntity<?> forgotPass(@RequestParam("email") String email) {
+        return ResponseEntity.ok(emailService.sendMailForgotPass(email));
+    }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PutMapping("change-password")
+    public ResponseEntity<?> changePassword(@RequestParam("old_password") String oldPassword,
+                                            @RequestParam("new_password") String newPassword) {
+        return ResponseEntity.ok(userService.changePassword(oldPassword, newPassword));
+    }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PutMapping("change-avatar")
+    public ResponseEntity<?> changeAvatar(@RequestPart("image") MultipartFile multipartFile) {
+        return ResponseEntity.ok(userService.changeAvatar(multipartFile));
+    }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @GetMapping(path = "/profile")
+    public ResponseEntity<?> getProfile() {
+        return ResponseEntity.ok(userService.getProfile());
+    }
+
+    @PutMapping("")
+    public ResponseEntity<?> updateCustomer(@RequestBody UserDto userDto) {
+        return ResponseEntity.ok(userService.updateUser(userDto));
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllUser(@RequestParam(name = "query", defaultValue = "") String query,
+                                        @RequestParam(name = "type_account", required = false) String typeAccount,
+                                        @RequestParam(name = "status", required = false) int status,
+                                        @RequestParam(name = "limit", defaultValue = "10") int limit,
+                                        @RequestParam(name = "page", defaultValue = "1") int page,
+                                        @RequestParam(name = "sort_by", defaultValue = "created_date") String sortBy,
+                                        @RequestParam(name = "sort_dir", defaultValue = "desc") String sortDir) {
+        return ResponseEntity.ok(userService.findAll(query, status, typeAccount, sortBy, sortDir, page, limit));
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteUserById(@RequestParam("id") int userId){
+        return ResponseEntity.ok(userService.deleteUser(userId));
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @DeleteMapping("/update-status")
+    public ResponseEntity<?> updateStatus(@RequestParam("id") int userId,
+                                          @RequestParam("status") int status){
+        return ResponseEntity.ok(userService.updateStatus(userId, status));
     }
 }

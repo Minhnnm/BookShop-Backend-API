@@ -15,12 +15,17 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Integer>{
     @Query("SELECT p from Product p where (p.name = :query or p.description = :query)" +
-            "AND p.category = :category AND p.supplier = :suplly AND p.author = :author")
+            "AND p.category = :category AND p.supplier = :supply AND p.author = :author")
     Page<Product> searchProduct(@Param("query") String query,
                                 @Param("category") Category category,
                                 @Param("author") Author author,
                                 @Param("supply") Supplier supplier,
                                 Pageable pageable);
+    List<Product> findByCategory(Category category);
+    List<Product> findByAuthor(Author author);
+    List<Product> findBySupplier(Supplier supplier);
+    Optional<Product> findByName(String productName);
+    Product findById(int id);
 //    Optional<Product> findByName(String productName);
 
 //    List<Product> findTop20ByOrderByIdDesc();

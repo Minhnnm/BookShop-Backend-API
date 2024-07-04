@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "product")
@@ -46,6 +47,12 @@ public class Product {
 
     @Column(name = "thumbnail", columnDefinition = "VARCHAR(255)")
     private String thumbnail;
+
+    @Column(name = "created_date")
+    private LocalDate createdDate;
+
+    @Column(name = "updated_date")
+    private LocalDate updatedDate;
 
     @ManyToOne
     @JoinColumn(name = "author_id")

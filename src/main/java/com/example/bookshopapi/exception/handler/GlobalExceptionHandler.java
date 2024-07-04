@@ -2,8 +2,10 @@ package com.example.bookshopapi.exception.handler;
 
 import com.example.bookshopapi.exception.BadRequestException;
 import com.example.bookshopapi.exception.ExistedException;
+import com.example.bookshopapi.exception.NotFoundException;
 import com.example.bookshopapi.exception.UnAuthorizedException;
 import io.jsonwebtoken.ExpiredJwtException;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,5 +45,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .build();
         return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<GlobalExceptionError> handleNotFoundException(NotFoundException e){
+        GlobalExceptionError apiError=GlobalExceptionError.builder()
+                .errorCode(e.getErrorCode())
+                .timestamp(LocalDateTime.now())
+                .field(e.getMessage())
+                .status(HttpStatus.NOT_FOUND)
+                .build();
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 }

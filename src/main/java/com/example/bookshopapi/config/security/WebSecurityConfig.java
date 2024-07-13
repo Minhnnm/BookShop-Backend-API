@@ -18,6 +18,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+//kích hoạt bảo mật ở mức method toàn cục và các annotation
+//@PreAuthorize, @PostAuthorize, @Secured, và @RolesAllowed để kiểm soát truy cập.
 @EnableGlobalMethodSecurity(prePostEnabled = true, proxyTargetClass = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
@@ -30,7 +32,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()           //tắt bảo vệ
                 .authorizeRequests()
-                .antMatchers("/users/register", "/users/login", "/product/**").permitAll()
+                .antMatchers("/users/register", "/users/login",
+                                "/users/forgot-password", "/product/**")
+                .permitAll()
 //                .antMatchers("/users/test").hasAnyRole("ADMIN")
                 .anyRequest().authenticated()
                 //không tạo/sử dụng phiên(session)

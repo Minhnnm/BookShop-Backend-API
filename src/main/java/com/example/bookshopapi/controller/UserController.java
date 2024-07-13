@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -40,8 +42,7 @@ public class UserController {
         return ResponseEntity.ok(userService.login(userRequestDto));
     }
 
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @PostMapping("forgot-password")
+    @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPass(@RequestParam("email") String email) {
         return ResponseEntity.ok(emailService.sendMailForgotPass(email));
     }
@@ -54,7 +55,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @PutMapping("change-avatar")
+    @PutMapping("/change-avatar")
     public ResponseEntity<?> changeAvatar(@RequestPart("image") MultipartFile multipartFile) {
         return ResponseEntity.ok(userService.changeAvatar(multipartFile));
     }
@@ -65,8 +66,9 @@ public class UserController {
         return ResponseEntity.ok(userService.getProfile());
     }
 
-    @PutMapping("")
-    public ResponseEntity<?> updateCustomer(@RequestBody UserDto userDto) {
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PutMapping("/update")
+    public ResponseEntity<?> updateUser(@RequestBody UserDto userDto) {
         return ResponseEntity.ok(userService.updateUser(userDto));
     }
 
@@ -74,24 +76,24 @@ public class UserController {
     @GetMapping("/all")
     public ResponseEntity<?> getAllUser(@RequestParam(name = "query", defaultValue = "") String query,
                                         @RequestParam(name = "type_account", required = false) String typeAccount,
-                                        @RequestParam(name = "status", required = false) int status,
+                                        @RequestParam(name = "status", required = false) Integer status,
                                         @RequestParam(name = "limit", defaultValue = "10") int limit,
                                         @RequestParam(name = "page", defaultValue = "1") int page,
-                                        @RequestParam(name = "sort_by", defaultValue = "created_date") String sortBy,
+                                        @RequestParam(name = "sort_by", defaultValue = "createdDate") String sortBy,
                                         @RequestParam(name = "sort_dir", defaultValue = "desc") String sortDir) {
         return ResponseEntity.ok(userService.findAll(query, status, typeAccount, sortBy, sortDir, page, limit));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteUserById(@RequestParam("id") int userId){
-        return ResponseEntity.ok(userService.deleteUser(userId));
-    }
+//    @PreAuthorize("hasAnyRole('ADMIN')")
+//    @DeleteMapping("/delete")
+//    public ResponseEntity<?> deleteUserById(@RequestParam("id") UUID userId) {
+//        return ResponseEntity.ok(userService.deleteUser(userId));
+//    }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
-    @DeleteMapping("/update-status")
-    public ResponseEntity<?> updateStatus(@RequestParam("id") int userId,
-                                          @RequestParam("status") int status){
-        return ResponseEntity.ok(userService.updateStatus(userId, status));
+    @PutMapping("/update-status")
+    public ResponseEntity<?> updateStatus(@RequestParam("user_id") UUID id,
+                                          @RequestParam("status") int status) {
+        return ResponseEntity.ok(userService.updateStatus(id, status));
     }
 }

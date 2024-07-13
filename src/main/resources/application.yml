@@ -27,7 +27,7 @@ spring:
   #set-max-file-size
   servlet:
     multipart:
-      max-request: 6MB
+      max-request-size: 6MB
       max-file-size: 3MB
 
 jwt:

@@ -17,6 +17,7 @@ import com.example.bookshopapi.repository.CartRepository;
 import com.example.bookshopapi.repository.RoleRepository;
 import com.example.bookshopapi.repository.UserRepository;
 import com.example.bookshopapi.repository.WishListRepository;
+import com.example.bookshopapi.service.CloudinaryService;
 import com.example.bookshopapi.service.UserService;
 import com.example.bookshopapi.util.CurrentUserUtil;
 import com.example.bookshopapi.util.enums.UserStatus;
@@ -32,7 +33,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
@@ -40,9 +40,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
-    private final Cloudinary cloudinary;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -59,6 +57,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private JwtUtil jwtUtil;
     @Autowired
     private CurrentUserUtil currentUserUtil;
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     @Override
     public List<User> getAll() {
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         WishList wishList = new WishList();
         Cart cart = new Cart();
         user.setAvatar("");
-        user.setCreatedDate(LocalDate.now());
+        user.setCreatedDate(LocalDateTime.now());
         user.setRole(roleRepository.getById(2));
 //        user.setStatus("active");
 //        String accessToken = jwtUtil.generateToken(customer);
@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public LoginResponse login(UserRequestDto userDto) {
         User user = userRepository.findByEmail(userDto.getEmail());
         if (user == null) {
-            throw new UsernameNotFoundException("Email không tồn tài trong hệ thống!");
+            throw new NotFoundException("USR_06", "Tài khoản không tồn tài trong hệ thống!", "");
         }
         if (user.getStatus() != 1) {
             throw new BadRequestException("USR_03", "Tài khoản đã bị khóa", "");
@@ -118,17 +118,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new BadRequestException("USR_04", "Mật khẩu cũ không chính xác!", "password");
         }
         currentUser.setPassword(bCryptPasswordEncoder.encode(newPassword));
-        currentUser.setUpdatedDate(LocalDate.now());
+        currentUser.setUpdatedDate(LocalDateTime.now());
         userRepository.save(currentUser);
         return new MessageDto("Đã thay đổi mật khẩu thành công!");
     }
 
     @Override
     public MessageDto changeAvatar(MultipartFile multiPartFile) {
-        String imageUrl = uploadImage(multiPartFile, "user");
+        String imageUrl = cloudinaryService.uploadFile(multiPartFile, "user");
         User currentUser = currentUserUtil.getCurrentUser();
         currentUser.setAvatar(imageUrl.replace("http", "https"));
-        currentUser.setUpdatedDate(LocalDate.now());
+        currentUser.setUpdatedDate(LocalDateTime.now());
         userRepository.save(currentUser);
         return new MessageDto("Đã thay đổi avatar thành công!");
     }
@@ -146,40 +146,42 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         currentUser.setMobPhone(userDto.getMobPhone());
         currentUser.setGender(userDto.getGender());
         currentUser.setDateOfBirth(userDto.getDateOfBirth());
-        currentUser.setUpdatedDate(LocalDate.now());
+        currentUser.setUpdatedDate(LocalDateTime.now());
         userRepository.save(currentUser);
         return new MessageDto("Cập nhật thông tin thành công!");
     }
 
     @Override
-    public List<UserDto> findAll(String query, int status, String typeAccount, String sortBy, String sortDir, int page, int limit) {
-        Sort sort = Sort.by(sortBy);
-        sort = "desc".equalsIgnoreCase(sortDir) ? sort.descending() : sort.ascending();
+    public List<UserDto> findAll(String query, Integer status, String typeAccount, String sortBy, String sortDir, int page, int limit) {
+//        Sort sort = Sort.by(sortBy);
+//        sort = "desc".equalsIgnoreCase(sortDir) ? sort.descending() : sort.ascending();
+        Sort sort = Sort.by(sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy);
         PageRequest pageRequest = PageRequest.of(page - 1, limit, sort);
         List<User> users = userRepository.findAll(query, status, typeAccount, pageRequest).getContent();
         return userMapper.toDtos(users);
     }
 
-    @Override
-    public MessageDto deleteUser(int userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("USR_05", "Can not find user by id: " + userId, "id")
-        );
-        user.setStatus(UserStatus.DELETED.getValue());
-        user.setUpdatedDate(LocalDate.now());
-        userRepository.save(user);
-        return new MessageDto("Đã xoá tài khoản khách hàng!");
-    }
+//    @Override
+//    public MessageDto deleteUser(UUID userId) {
+//        User user = userRepository.findById(userId).orElseThrow(
+//                () -> new NotFoundException("USR_05", "Can not find user by id: " + userId, "id")
+//        );
+//        user.setStatus(UserStatus.DELETED.getValue());
+//        user.setUpdatedDate(LocalDateTime.now());
+//        userRepository.save(user);
+//        return new MessageDto("Đã xoá tài khoản khách hàng!");
+//    }
 
     @Override
-    public MessageDto updateStatus(int userId, int status) {
+    public MessageDto updateStatus(UUID userId, int status) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("USR_05", "Can not find user by id: " + userId, "id")
         );
         user.setStatus(status);
-        user.setUpdatedDate(LocalDate.now());
+        user.setUpdatedDate(LocalDateTime.now());
         userRepository.save(user);
-        return status==UserStatus.ACTIVE.getValue() ? new MessageDto("Đã mở khóa tài khoản khách hàng!") : new MessageDto("Đã khóa tài khoản khách hàng!");
+//        return status == UserStatus.ACTIVE.getValue() ? new MessageDto("Đã mở khóa tài khoản khách hàng!") : new MessageDto("Đã khóa tài khoản khách hàng!");
+        return new MessageDto(UserStatus.getMessageByValue(status));
     }
 
 
@@ -191,19 +193,5 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName().toUpperCase())));
-    }
-
-    public String uploadImage(MultipartFile multiPartFile, String folderName) {
-        try {
-            Map<String, Object> uploadParams = new HashMap<>();
-            uploadParams.put("public_id", UUID.randomUUID().toString());
-            uploadParams.put("folder", folderName);
-            return cloudinary.uploader()
-                    .upload(multiPartFile.getBytes(), uploadParams)
-                    .get("url")
-                    .toString();
-        } catch (IOException e) {
-            throw new BadRequestException(e.getMessage());
-        }
     }
 }

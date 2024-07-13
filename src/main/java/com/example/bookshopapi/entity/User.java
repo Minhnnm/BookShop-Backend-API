@@ -4,9 +4,13 @@ import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user")
@@ -15,9 +19,14 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    @Type(type="uuid-char")
+    private UUID id;
 
     @NotNull
     @Column(name = "name", columnDefinition = "VARCHAR(255)")
@@ -47,11 +56,11 @@ public class User {
     @Column(name = "avatar")
     private String avatar;
 
-    @Column(name = "created_date")
-    private LocalDate createdDate;
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime createdDate;
 
-    @Column(name = "updated_date")
-    private LocalDate updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
 
     @ManyToOne
     @JoinColumn(name = "role_id")

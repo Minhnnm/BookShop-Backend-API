@@ -26,7 +26,7 @@ public class Cart {
     private UUID id;
 
     @OneToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "user_id")
     private User user;
 //    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
 //    @JsonIgnore

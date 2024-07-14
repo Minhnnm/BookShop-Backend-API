@@ -16,7 +16,7 @@ public class WishList {
     private int id;
 
     @OneToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
 //    @OneToMany(mappedBy = "wishList", cascade = CascadeType.ALL)

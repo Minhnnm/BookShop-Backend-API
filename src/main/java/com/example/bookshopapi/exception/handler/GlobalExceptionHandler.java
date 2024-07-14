@@ -52,7 +52,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         GlobalExceptionError apiError=GlobalExceptionError.builder()
                 .errorCode(e.getErrorCode())
                 .timestamp(LocalDateTime.now())
-                .field(e.getMessage())
+                .message(e.getMessage())
+                .field(e.getField())
                 .status(HttpStatus.NOT_FOUND)
                 .build();
         return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.NOT_FOUND);

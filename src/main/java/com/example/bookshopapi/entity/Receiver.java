@@ -26,6 +26,6 @@ public class Receiver {
     @Column(name = "is_selected")
     private int isSelected;
     @ManyToOne
-    @JoinColumn(name = "customerId")
+    @JoinColumn(name = "user_id")
     private User user;
 }

@@ -4,10 +4,14 @@ import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "product")
@@ -16,9 +20,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
-    private int id;
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    @Type(type = "uuid-char")
+    private UUID id;
 
     @NotNull
     @Column(name = "name", columnDefinition = "VARCHAR(100)")
@@ -34,7 +43,7 @@ public class Product {
 
     @NotNull
     @Column(name = "discounted_price", precision = 10, scale = 2)
-    private BigDecimal discounted_price;
+    private BigDecimal discountedPrice;
 
     @Column(name = "quantity")
     private int quantity;
@@ -48,11 +57,11 @@ public class Product {
     @Column(name = "thumbnail", columnDefinition = "VARCHAR(255)")
     private String thumbnail;
 
-    @Column(name = "created_date")
-    private LocalDate createdDate;
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdDate = LocalDateTime.now();
 
-    @Column(name = "updated_date")
-    private LocalDate updatedDate;
+    @Column(name = "updated_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime updatedDate;
 
     @ManyToOne
     @JoinColumn(name = "author_id")
@@ -68,6 +77,9 @@ public class Product {
 
     @Column(name = "banner_url")
     private String banner;
+
+    @Column(name = "status", nullable = false, columnDefinition = "INT DEFAULT 1")
+    private int status = 1;
 
     //    List<CartItem> cartItems;
 //    @Column(name = "purchase_status")

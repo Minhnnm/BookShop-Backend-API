@@ -9,19 +9,27 @@ import com.example.bookshopapi.entity.Product;
 import com.example.bookshopapi.entity.Supplier;
 import com.example.bookshopapi.exception.BadRequestException;
 import com.example.bookshopapi.exception.ExistedException;
+import com.example.bookshopapi.exception.NotFoundException;
 import com.example.bookshopapi.mapper.ProductMapper;
 import com.example.bookshopapi.repository.AuthorRepository;
 import com.example.bookshopapi.repository.CategoryRepository;
 import com.example.bookshopapi.repository.ProductRepository;
 import com.example.bookshopapi.repository.SupplyRepository;
+import com.example.bookshopapi.service.CloudinaryService;
 import com.example.bookshopapi.service.ProductService;
+import com.example.bookshopapi.util.enums.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -34,6 +42,8 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private AuthorRepository authorRepository;
     @Autowired
+    private CloudinaryService cloudinaryService;
+    @Autowired
     private ProductMapper productMapper;
 
     @Override
@@ -43,13 +53,13 @@ public class ProductServiceImpl implements ProductService {
         sort = "desc".equalsIgnoreCase(sortDir) ? sort.descending() : sort.ascending();
         PageRequest pageRequest = PageRequest.of(page - 1, limit, sort);
         Category category = categoryId == null ? null : categoryRepository.findById(categoryId).orElseThrow(
-                () -> new BadRequestException("Can not find category with id : " + categoryId)
+                () -> new NotFoundException("Can not find category with id : " + categoryId)
         );
         Author author = authorId == null ? null : authorRepository.findById(authorId).orElseThrow(
-                () -> new BadRequestException("Can not find author with id : " + authorId)
+                () -> new NotFoundException("Can not find author with id : " + authorId)
         );
         Supplier supplier = supplierId == null ? null : supplyRepository.findById(supplierId).orElseThrow(
-                () -> new BadRequestException("Can not find category with id : " + supplierId)
+                () -> new NotFoundException("Can not find category with id : " + supplierId)
         );
         List<Product> products = productRepository.searchProduct(query, category, author, supplier, pageRequest).getContent();
         return productMapper.toDtos(products);
@@ -58,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDto> findByCategory(Integer categoryId) {
         Category category = categoryId == null ? null : categoryRepository.findById(categoryId).orElseThrow(
-                () -> new BadRequestException("Can not find category with id : " + categoryId)
+                () -> new NotFoundException("Can not find category with id : " + categoryId)
         );
         List<Product> products = productRepository.findByCategory(category);
         return productMapper.toDtos(products);
@@ -67,7 +77,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDto> findBySupplier(Integer supplierId) {
         Supplier supplier = supplierId == null ? null : supplyRepository.findById(supplierId).orElseThrow(
-                () -> new BadRequestException("Can not find supplier with id: " + supplierId)
+                () -> new NotFoundException("Can not find supplier with id: " + supplierId)
         );
         List<Product> products = productRepository.findBySupplier(supplier);
         return productMapper.toDtos(products);
@@ -76,39 +86,72 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDto> findByAuthor(Integer authorId) {
         Author author = authorId == null ? null : authorRepository.findById(authorId).orElseThrow(
-                () -> new BadRequestException("Can nont find author with id: " + authorId)
+                () -> new NotFoundException("Can not find author with id: " + authorId)
         );
         List<Product> products = productRepository.findByAuthor(author);
         return productMapper.toDtos(products);
     }
 
     @Override
-    public ProductDto findById(Integer id) {
+    public ProductDto findById(UUID id) {
         Product product = productRepository.findById(id).orElseThrow(
-                () -> new BadRequestException("Can not find product with id: " + id)
+                () -> new NotFoundException("Can not find product with id: " + id)
         );
         return productMapper.toDto(product);
     }
 
     @Override
-    public MessageDto create(ProductRequestDto productRequest) {
-        Optional<Product> product = productRepository.findByName(productRequest.getName());
-        if(product.isPresent()){
+    public MessageDto create(ProductRequestDto productRequest, MultipartFile file) {
+        Optional<Product> existedProduct = productRepository.findByName(productRequest.getName());
+        if (existedProduct.isPresent()) {
             throw new ExistedException("Sản phẩm này đã tồn tại trong hệ thống");
         }
-//        MultipartFile multipartFile = new MultiPartFile().createMultipartFileFromUrl(productRequest.getImage(), productRequest.getFileName());
-//        String imageURL = customerService.uploadFile(multipartFile, "product");
-//        Product = new BookUtil().setBookFromRequest(bookRequest);
-//        book.setImage(imageURL.replace("http", "https"));
-//        book.setThumbnail(imageURL.replace("http", "https"));
-//        if (bookRequest.getIsBannerSelected()) {
-//            book.setBanner(imageURL.replace("http", "https"));
-//        }
-//        productService.addBook(book);
+//        Product product = new Product();
+        String imageUrl = cloudinaryService.uploadFile(file, "products")
+                .replace("http", "https");
+        Product product = productMapper.toEntity(productRequest);
+        product.setImage(imageUrl);
+        if (productRequest.getIsBannerSelected()) {
+            product.setBanner(imageUrl);
+        }
+        productRepository.save(product);
         return new MessageDto("Đã thêm sản phẩm thành công!");
     }
 
-    //    @Override
+    @Override
+    public MessageDto delete(UUID productId) {
+        Product product = productRepository.findById(productId).orElseThrow(
+                () -> new NotFoundException("Can not find product with id: " + productId)
+        );
+        product.setStatus(UserStatus.DELETED.getValue());
+        product.setUpdatedDate(LocalDateTime.now());
+        productRepository.save(product);
+        return new MessageDto("Đã xóa sản phẩm thành công!");
+    }
+
+    @Override
+    public MessageDto update(ProductRequestDto productRequest, MultipartFile file) throws IOException {
+        Product product = productRepository.findById(productRequest.getId()).orElseThrow(
+                () -> new NotFoundException("Can not find product with id: " + productRequest.getId())
+        );
+        product.setName(productRequest.getName());
+        product.setDescription(productRequest.getDescription());
+        product.setPrice(productRequest.getPrice());
+        product.setDiscountedPrice(productRequest.getDiscountedPrice());
+        product.setQuantity(productRequest.getQuantity());
+        product.setAuthor(productRequest.getAuthor());
+        product.setSupplier(productRequest.getSupplier());
+        product.setCategory(productRequest.getCategory());
+        product.setUpdatedDate(LocalDateTime.now());
+        if (file.getBytes().length != 0) {
+            String imageUrl = cloudinaryService.uploadFile(file, "products")
+                    .replace("http", "https");
+            product.setImage(imageUrl);
+        }
+        productRepository.save(product);
+        return new MessageDto("Đã cập nhật sản phẩm thành công!");
+    }
+//    @Override
 //    public Optional<Product> findById(int productId) {
 //        return productRepository.findById(productId);
 //    }

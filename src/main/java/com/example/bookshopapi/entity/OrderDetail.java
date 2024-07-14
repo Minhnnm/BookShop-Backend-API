@@ -18,7 +18,7 @@ public class OrderDetail {
     private int id;
 
     @Column(name = "book_name")
-    private String productName;
+    private String bookName;
 
     @Column(name = "quantity")
     private int quantity;

@@ -5,6 +5,8 @@ import com.example.bookshopapi.entity.Cart;
 import com.example.bookshopapi.entity.CartItem;
 import com.example.bookshopapi.entity.Product;
 import com.example.bookshopapi.entity.User;
+import com.example.bookshopapi.exception.ExistedException;
+import com.example.bookshopapi.exception.NotFoundException;
 import com.example.bookshopapi.repository.CartItemRepository;
 import com.example.bookshopapi.repository.CartRepository;
 import com.example.bookshopapi.repository.ProductRepository;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -30,9 +33,11 @@ public class CartServiceImpl implements CartService {
     private CurrentUserUtil currentUserUtil;
 
     @Override
-    public List<CartItemDto> addItemToCart(int productId) {
+    public List<CartItemDto> addItemToCart(UUID productId) {
         User currentUser = currentUserUtil.getCurrentUser();
-        Product product = productRepository.findById(productId);
+        Product product = productRepository.findById(productId).orElseThrow(
+                ()->new NotFoundException("Can not find product with id: " + productId)
+        );
         Cart cart=cartRepository.findByUserId(currentUser.getId());
 //        Optional<CartItem> cartItemExisted = cartItemRepository.findByProductIdAndCartUserId(productId, currentUser.getId());
 //        if (!cartItemExisted.isPresent()) {

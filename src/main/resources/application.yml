@@ -32,3 +32,7 @@ spring:
 
 jwt:
   secret: minhnn_jwt
+cloudinary:
+  cloud-name: dnumoo4ox
+  api-key: 871246556211856
+  api-secret: pHwLvQgSoV9sOBogBKknNoDuxZg

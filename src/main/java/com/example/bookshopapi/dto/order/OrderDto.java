@@ -15,7 +15,7 @@ public class OrderDto {
     private String total_quantity;
     private String created_on;
     private String shipped_on;
-    private int customer_id;
+    private int user_id;
     private String address;
     private String receiver_name;
     private String receiver_phone;

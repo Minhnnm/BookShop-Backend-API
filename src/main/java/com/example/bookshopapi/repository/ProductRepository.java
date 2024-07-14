@@ -12,20 +12,24 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public interface ProductRepository extends JpaRepository<Product, Integer>{
-    @Query("SELECT p from Product p where (p.name = :query or p.description = :query)" +
-            "AND p.category = :category AND p.supplier = :supply AND p.author = :author")
+public interface ProductRepository extends JpaRepository<Product, UUID>{
+    @Query("SELECT p FROM Product p " +
+            "WHERE (p.name like %:query% OR p.description like %:query%) " +
+            "AND (:category IS NULL OR p.category = :category) " +
+            "AND (:supplier IS NULL OR p.supplier = :supplier) " +
+            "AND (:author IS NULL OR p.author = :author)")
     Page<Product> searchProduct(@Param("query") String query,
                                 @Param("category") Category category,
                                 @Param("author") Author author,
-                                @Param("supply") Supplier supplier,
+                                @Param("supplier") Supplier supplier,
                                 Pageable pageable);
     List<Product> findByCategory(Category category);
     List<Product> findByAuthor(Author author);
     List<Product> findBySupplier(Supplier supplier);
     Optional<Product> findByName(String productName);
-    Product findById(int id);
+//    Product findById(UUID id);
 //    Optional<Product> findByName(String productName);
 
 //    List<Product> findTop20ByOrderByIdDesc();

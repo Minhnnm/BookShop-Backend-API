@@ -3,9 +3,12 @@ package com.example.bookshopapi.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -15,15 +18,19 @@ import java.util.Date;
 @AllArgsConstructor
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    @Type(type="uuid-char")
     private int id;
 
     @Column(name = "total_amount", precision = 10, scale = 2)
     private BigDecimal totalAmount;
 
-    @Column(name = "create_on")
-    private Date createOn;
+    @Column(name = "create_on", columnDefinition = "TIMESTAMP")
+    private LocalDateTime createOn;
 
     @Column(name = "shipped_on")
     private Date shippedOn;
@@ -37,11 +44,11 @@ public class Order {
     @Column(name = "receiver_phone", columnDefinition = "VARCHAR(10)")
     private String receiverPhone;
 
-    @Column(name = "isRating")
+    @Column(name = "is_rating")
     private int isRating;
 
     @ManyToOne
-    @JoinColumn(name = "customerId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne

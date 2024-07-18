@@ -30,4 +30,5 @@ public class ProductDto {
     private String categoryName;
     private int categoryId;
     private String banner;
+    private double ratingLevel;
 }

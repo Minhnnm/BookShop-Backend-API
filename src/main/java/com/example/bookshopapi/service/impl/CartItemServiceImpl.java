@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CartItemServiceImpl implements CartItemService {
@@ -21,7 +22,7 @@ public class CartItemServiceImpl implements CartItemService {
     private CurrentUserUtil currentUserUtil;
 
     @Override
-    public CartItem getProductInCart(int productId) {
+    public CartItem getProductInCart(UUID productId) {
         User currentUser = currentUserUtil.getCurrentUser();
         CartItem cartItem = cartItemRepository.findByProductIdAndCartUserId(productId, currentUser.getId()).orElseThrow(
                 () -> new NotFoundException("Can not find cartitem")

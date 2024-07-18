@@ -27,7 +27,7 @@ public abstract class ProductDecorator implements ProductMapper {
         }
         if(entity.getSupplier()!=null){
             productDto.setSupplierId(entity.getSupplier().getId());
-            productDto.setCategoryName(entity.getCategory().getName());
+            productDto.setSupplierName(entity.getSupplier().getName());
         }
         return productDto;
     }

@@ -2,6 +2,8 @@ package com.example.bookshopapi.service;
 
 import com.example.bookshopapi.entity.CartItem;
 
+import java.util.UUID;
+
 public interface CartItemService {
-    CartItem getProductInCart(int productId);
+    CartItem getProductInCart(UUID productId);
 }

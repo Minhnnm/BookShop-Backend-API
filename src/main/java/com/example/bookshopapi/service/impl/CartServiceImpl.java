@@ -1,5 +1,6 @@
 package com.example.bookshopapi.service.impl;
 
+import com.example.bookshopapi.dto.MessageDto;
 import com.example.bookshopapi.dto.cart.CartItemDto;
 import com.example.bookshopapi.entity.Cart;
 import com.example.bookshopapi.entity.CartItem;
@@ -33,24 +34,25 @@ public class CartServiceImpl implements CartService {
     private CurrentUserUtil currentUserUtil;
 
     @Override
-    public List<CartItemDto> addItemToCart(UUID productId) {
+    public MessageDto addItemToCart(UUID productId) {
         User currentUser = currentUserUtil.getCurrentUser();
         Product product = productRepository.findById(productId).orElseThrow(
-                ()->new NotFoundException("Can not find product with id: " + productId)
+                () -> new NotFoundException("Can not find product with id: " + productId)
         );
-        Cart cart=cartRepository.findByUserId(currentUser.getId());
-//        Optional<CartItem> cartItemExisted = cartItemRepository.findByProductIdAndCartUserId(productId, currentUser.getId());
-//        if (!cartItemExisted.isPresent()) {
-//            CartItem cartItem = new CartItem();
-//            cartItem.setCart(cart);
-//            cartItem.setProduct(product);
-//            cartItem.setQuantity(1);
-//            cartItem.setAddOn(LocalDateTime.now());
-//            cartItemRepository.save(cartItem);
-//        } else {
-//            cartItemExisted.setQuantity(cartItemExisted.getQuantity() + 1);
-//            cartItemService.save(cartItemExisted);
-//        }
-        return null;
+        Cart cart = cartRepository.findByUserId(currentUser.getId());
+        Optional<CartItem> cartItemExisted = cartItemRepository.findByProductIdAndCartUserId(productId, currentUser.getId());
+        CartItem cartItem;
+        if (!cartItemExisted.isPresent()) {
+            cartItem = new CartItem();
+            cartItem.setCart(cart);
+            cartItem.setProduct(product);
+            cartItem.setQuantity(1);
+            cartItem.setAddOn(LocalDateTime.now());
+        } else {
+            cartItem = cartItemExisted.get();
+            cartItem.setQuantity(cartItem.getQuantity() + 1);
+        }
+        cartItemRepository.save(cartItem);
+        return new MessageDto("Đã thêm sản phẩm vào giỏ hàng");
     }
 }

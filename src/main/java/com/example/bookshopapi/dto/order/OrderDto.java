@@ -15,9 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDto {
-    @JsonProperty("id")
     private UUID order_id;
-    @JsonProperty("total_amount")
     private String merchandise_subtotal;
     private String total_quantity;
     private String created_on;

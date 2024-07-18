@@ -17,6 +17,7 @@ import com.example.bookshopapi.repository.ProductRepository;
 import com.example.bookshopapi.repository.SupplyRepository;
 import com.example.bookshopapi.service.CloudinaryService;
 import com.example.bookshopapi.service.ProductService;
+import com.example.bookshopapi.service.RatingService;
 import com.example.bookshopapi.util.enums.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -41,6 +42,8 @@ public class ProductServiceImpl implements ProductService {
     private SupplyRepository supplyRepository;
     @Autowired
     private AuthorRepository authorRepository;
+    @Autowired
+    private RatingService ratingService;
     @Autowired
     private CloudinaryService cloudinaryService;
     @Autowired
@@ -93,11 +96,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto findById(UUID id) {
-        Product product = productRepository.findById(id).orElseThrow(
-                () -> new NotFoundException("Can not find product with id: " + id)
+    public ProductDto findById(UUID productId) {
+        Product product = productRepository.findById(productId).orElseThrow(
+                () -> new NotFoundException("Can not find product with id: " + productId)
         );
-        return productMapper.toDto(product);
+        double ratingLevel = ratingService.ratingLevel(productId);
+        ProductDto productDto = productMapper.toDto(product);
+        productDto.setRatingLevel(ratingLevel);
+        return productDto;
     }
 
     @Override
@@ -106,7 +112,6 @@ public class ProductServiceImpl implements ProductService {
         if (existedProduct.isPresent()) {
             throw new ExistedException("Sản phẩm này đã tồn tại trong hệ thống");
         }
-//        Product product = new Product();
         String imageUrl = cloudinaryService.uploadFile(file, "products")
                 .replace("http", "https");
         Product product = productMapper.toEntity(productRequest);

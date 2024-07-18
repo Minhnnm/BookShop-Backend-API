@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.LocalDateTime;
@@ -43,8 +44,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<GlobalExceptionError> handleNotFoundException(NotFoundException e){
-        GlobalExceptionError apiError=GlobalExceptionError.builder()
+    public ResponseEntity<GlobalExceptionError> handleNotFoundException(NotFoundException e) {
+        GlobalExceptionError apiError = GlobalExceptionError.builder()
                 .errorCode(e.getErrorCode())
                 .timestamp(LocalDateTime.now())
                 .message(e.getMessage())
@@ -53,8 +54,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .build();
         return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
+
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<?> handleFileSizeLimitExceededException() {
-        return ResponseEntity.badRequest().body(new MaxUploadSizeExceededException("File size exceeds the configured limit (3MB). Please upload a smaller file."));
+    public ResponseEntity<?> handleFileSizeLimitExceededException(MaxUploadSizeExceededException ex) {
+        String errorMessage = ex.getCause().getCause().getMessage();
+        errorMessage = "File " + errorMessage.substring(errorMessage.indexOf("exceeds"));
+        errorMessage += ". Please upload a smaller file";
+        GlobalExceptionError apiError = GlobalExceptionError.builder()
+                .errorCode(HttpStatus.BAD_REQUEST.toString())
+                .timestamp(LocalDateTime.now())
+                .message(errorMessage)
+                .field("File")
+                .status(HttpStatus.BAD_REQUEST)
+                .build();
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 }

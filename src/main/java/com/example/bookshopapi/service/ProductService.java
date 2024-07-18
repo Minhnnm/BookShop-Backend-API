@@ -27,7 +27,7 @@ public interface ProductService {
 
     ProductDto findById(UUID id);
 
-    MessageDto create(ProductRequestDto product, MultipartFile file);
+    MessageDto create(ProductRequestDto product, MultipartFile file) throws IOException;
 
     MessageDto delete(UUID productId);
 

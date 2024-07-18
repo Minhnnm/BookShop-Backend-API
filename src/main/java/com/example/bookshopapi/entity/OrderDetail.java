@@ -1,10 +1,14 @@
 package com.example.bookshopapi.entity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "order_detail")
@@ -13,9 +17,12 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class OrderDetail {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator")
+    @Type(type = "uuid-char")
+    private UUID id;
 
     @Column(name = "book_name")
     private String bookName;

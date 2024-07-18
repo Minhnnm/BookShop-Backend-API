@@ -19,7 +19,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class User {
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
             name = "UUID",

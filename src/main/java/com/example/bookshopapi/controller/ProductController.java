@@ -64,7 +64,7 @@ public class ProductController {
     @PostMapping(path = "/create")
     public ResponseEntity<?> create(
             @RequestPart ProductRequestDto product,
-            @RequestPart(name = "file", required = false) MultipartFile file) {
+            @RequestPart(name = "file", required = false) MultipartFile file) throws IOException {
         return ResponseEntity.ok(productService.create(product, file));
     }
 

@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
@@ -21,10 +22,9 @@ public class Order {
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
             name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Type(type="uuid-char")
-    private int id;
+            strategy = "org.hibernate.id.UUIDGenerator")
+    @Type(type = "uuid-char")
+    private UUID id;
 
     @Column(name = "total_amount", precision = 10, scale = 2)
     private BigDecimal totalAmount;

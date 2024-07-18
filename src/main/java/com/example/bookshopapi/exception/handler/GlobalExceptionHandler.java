@@ -1,11 +1,6 @@
 package com.example.bookshopapi.exception.handler;
 
-import com.example.bookshopapi.exception.BadRequestException;
-import com.example.bookshopapi.exception.ExistedException;
-import com.example.bookshopapi.exception.NotFoundException;
-import com.example.bookshopapi.exception.UnAuthorizedException;
-import io.jsonwebtoken.ExpiredJwtException;
-import org.aspectj.weaver.ast.Not;
+import com.example.bookshopapi.exception.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,5 +52,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .build();
         return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<?> handleFileSizeLimitExceededException() {
+        return ResponseEntity.badRequest().body(new MaxUploadSizeExceededException("File size exceeds the configured limit (3MB). Please upload a smaller file."));
     }
 }

@@ -8,4 +8,8 @@ import java.util.UUID;
 
 public interface CartService {
     MessageDto addItemToCart(UUID productId);
+    List<CartItemDto> findProductInCart(int page, int limit);
+    MessageDto emptyCart();
+    MessageDto removeProductById(UUID productId);
+    MessageDto changeQuantity(UUID cartItemId, Integer quantity);
 }

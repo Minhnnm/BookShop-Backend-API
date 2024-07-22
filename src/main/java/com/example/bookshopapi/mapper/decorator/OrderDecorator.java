@@ -2,6 +2,7 @@ package com.example.bookshopapi.mapper.decorator;
 
 import com.example.bookshopapi.dto.order.OrderDto;
 import com.example.bookshopapi.entity.Order;
+import com.example.bookshopapi.entity.Shipping;
 import com.example.bookshopapi.mapper.OrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,8 +22,10 @@ public abstract class OrderDecorator implements OrderMapper {
             orderDto.setOrder_status(entity.getOrderStatus().getStatus());
         }
         if (entity.getShipping() != null) {
-            orderDto.setShipping_type(entity.getShipping().getShippingType());
-            orderDto.setShipping_cost(entity.getShipping().getShippingCost());
+            Shipping shipping=entity.getShipping();
+            orderDto.setShipping_type(shipping.getShippingType());
+            orderDto.setShipping_cost(shipping.getShippingCost());
+            orderDto.setMerchandise_subtotal(entity.getTotalAmount().add(shipping.getShippingCost()).toString());
         }
         return orderDto;
     }
@@ -34,7 +37,7 @@ public abstract class OrderDecorator implements OrderMapper {
         }
         List<OrderDto> orderDtos = new ArrayList<>();
         for (Order order : entities) {
-            orderDtos.add(delegate.toDto(order));
+            orderDtos.add(toDto(order));
         }
         return orderDtos;
     }

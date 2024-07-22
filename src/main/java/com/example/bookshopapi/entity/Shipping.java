@@ -22,7 +22,7 @@ public class Shipping {
     private String shippingType;
 
     @Column(name = "shipping_cost", precision = 10, scale = 2)
-    private int shippingCost;
+    private BigDecimal shippingCost;
 
 //    @OneToMany(mappedBy = "shipping", cascade = CascadeType.ALL)
 //    @JsonIgnore

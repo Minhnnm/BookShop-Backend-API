@@ -13,6 +13,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 
@@ -36,9 +37,9 @@ public class DataInitializer {
                 roleRepository.saveAll(Arrays.asList(role, role2));
             }
             if (shippingRepository.count() == 0) {
-                Shipping shipping = new Shipping(1, "Hỏa tốc", 50000);
-                Shipping shipping2 = new Shipping(2, "Nhanh", 30000);
-                Shipping shipping3 = new Shipping(3, "Tiết kiệm", 10000);
+                Shipping shipping = new Shipping(1, "Hỏa tốc", new BigDecimal(50000));
+                Shipping shipping2 = new Shipping(2, "Nhanh", new BigDecimal(30000));
+                Shipping shipping3 = new Shipping(3, "Tiết kiệm", new BigDecimal(10000));
                 shippingRepository.saveAll(Arrays.asList(shipping, shipping2, shipping3));
             }
             if (paymentRepository.count() == 0) {

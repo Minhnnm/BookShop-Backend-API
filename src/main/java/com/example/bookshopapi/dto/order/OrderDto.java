@@ -16,18 +16,16 @@ import java.util.UUID;
 @AllArgsConstructor
 public class OrderDto {
     private UUID order_id;
-    private String merchandise_subtotal;
-    private String total_quantity;
-    private String created_on;
-    private String shipped_on;
-    private int user_id;
-    private String address;
     private String receiver_name;
     private String receiver_phone;
-    private int shipping_id;
+    private String address;
+    private String created_on;
+    private String shipped_on;
     private String shipping_type;
-    private int shipping_cost;
+    private BigDecimal shipping_cost;
+    private String total_quantity;
+    private String order_amount;
+    private String merchandise_subtotal;
     private String order_status;
-    private String order_total;
     private int is_rating;
 }

@@ -127,7 +127,7 @@ public class EmailServiceImpl implements EmailService {
                 .append("<span style='font-weight: bold;'>Phí vận chuyển: ")
                 .append(formatter.format(order.getShipping().getShippingCost()))
                 .append("</span><br>").append("<span style='font-weight: bold;'>Tổng thanh toán: ")
-                .append(formatter.format(subTotal.add(new BigDecimal(order.getShipping().getShippingCost()))))
+                .append(formatter.format(subTotal.add(order.getShipping().getShippingCost())))
                 .append("</span></br>").append("<hr>").append("<span>Trân trọng,</span><br>")
                 .append("<span>Đội ngũ BookShop.</span>");
         String email=user.getEmail();

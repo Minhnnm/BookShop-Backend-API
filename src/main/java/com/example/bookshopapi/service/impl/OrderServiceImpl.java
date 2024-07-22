@@ -41,6 +41,8 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private PaymentRepository paymentRepository;
     @Autowired
+    private ProductRepository productRepository;
+    @Autowired
     private EmailService emailService;
     @Autowired
     private OrderDetailService orderDetailService;
@@ -69,6 +71,11 @@ public class OrderServiceImpl implements OrderService {
                 subTotal = subTotal.add(cartItem.get().getProduct().getDiscountedPrice().
                         multiply(new BigDecimal(cartItem.get().getQuantity())));
                 cartItems.add(cartItem.get());
+                Product product = productRepository.findById(cartItem.get().getProduct().getId()).orElseThrow(
+                        () -> new NotFoundException("Can not find product with id: " + cartItem.get().getProduct().getId())
+                );
+                product.setQuantitySold(product.getQuantitySold() + cartItem.get().getQuantity());
+                productRepository.save(product);
             }
         }
         Receiver receiver = receiverRepository.findById(orderRequest.getReceiverId()).orElseThrow(

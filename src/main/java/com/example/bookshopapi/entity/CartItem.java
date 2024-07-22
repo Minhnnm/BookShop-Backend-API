@@ -25,6 +25,8 @@ public class CartItem {
     private int quantity;
     @Column(name = "add_on")
     private LocalDateTime addOn;
+    @Column(name = "update_on")
+    private LocalDateTime updateOn;
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private Cart cart;
